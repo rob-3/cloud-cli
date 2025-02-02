@@ -28,7 +28,7 @@ runcmd:
                            {:name server-name
                             :server_type "cpx11"
                             :image "fedora-41"
-                            :ssh_keys ["rob@Roberts-MacBook-Pro.local"]
+                            :ssh_keys ["macbook pro 14"]
                             :user_data (base64-encode cloud-init)
                             :location "hil"
                             :firewalls [{:firewall 1676272}]})})
