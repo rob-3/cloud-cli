@@ -8,9 +8,9 @@
 #cloud-config
 packages:
   - tailscale
-  - git
 runcmd:
   - systemctl enable --now tailscaled
+  - curl https://raw.githubusercontent.com/rob-3/dotfiles/refs/heads/master/setup.sh | bash
   - tailscale up --authkey " (System/getenv "TAILSCALE_KEY")))
 
 (defn base64-encode [s]
@@ -18,7 +18,7 @@ runcmd:
        .getBytes
        (.encodeToString (java.util.Base64/getEncoder))))
 
-(defn create-server [server-name]
+(defn create-server [server-name opts]
   (if-not server-name
     (println "Usage: cloud create <name>")
     (-> (http/post "https://api.hetzner.cloud/v1/servers"
@@ -26,7 +26,7 @@ runcmd:
                               "Content-Type" "application/json"}
                     :body (json/generate-string
                            {:name server-name
-                            :server_type "cpx11"
+                            :server_type (or (:sku opts) "cpx11")
                             :image "fedora-41"
                             :ssh_keys ["macbook pro 14"]
                             :user_data (base64-encode cloud-init)
@@ -70,16 +70,17 @@ runcmd:
       (println (:name server)))))
 
 (defn -main [args]
-  (let [[subcommand arg1] (-> args cli/parse-args :args)]
+  (let [{[subcommand arg1] :args opts :opts} (-> args cli/parse-args)]
     (case subcommand
-      "create" (create-server arg1)
+      "create" (create-server arg1 opts)
       "delete" (delete-server arg1)
       "list" (get-servers)
       (println "Usage: cloud create <name>"))))
 
 (comment
+  (def args ["create" "fedora" "--sku" "cpx11"])
   (-main ["create"])
-  (create-server "hetzner2")
+  (create-server "hetzner2" {})
   (delete-server "hetzner")
   (get-servers))
 
