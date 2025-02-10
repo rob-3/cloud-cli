@@ -10,7 +10,7 @@ packages:
   - tailscale
 runcmd:
   - systemctl enable --now tailscaled
-  - curl https://raw.githubusercontent.com/rob-3/dotfiles/refs/heads/master/setup.sh | bash
+  - 'curl https://raw.githubusercontent.com/rob-3/dotfiles/refs/heads/master/setup.sh | bash'
   - tailscale up --authkey " (System/getenv "TAILSCALE_KEY")))
 
 (defn base64-encode [s]
